@@ -1,0 +1,54 @@
+.no-border{
+    border: 0;
+    background-color: white;
+}
+.linkSpanner{
+    position:absolute; 
+    width:100%;
+    height:100%;
+    top:0;
+    left: 0;
+    z-index: 1;
+}   
+.hover:hover{
+    box-shadow: 0 0 11px rgba(33,33,33,.2); 
+
+}
+img:hover{
+    box-shadow: 0 0 11px rgba(33,33,33,.2); 
+}
+.above{
+    z-index: 2 !important;
+}
+body{
+    background-color: white !important;
+}
+.username{
+    text-decoration: none;
+    color: black;
+}
+.username:hover{
+    text-decoration: underline;
+    color: black;
+}
+.dugme{
+    background-color: #1DA1F2;
+    color: white;
+}
+.twitter-color{
+    color: #1DA1F2;
+}
+.atcolor{
+    color: #657786 !important;
+}
+.border-light{
+    border-color: #E1E8ED !important;
+}
+.textarea{
+    resize: none;
+    background-color: white;
+}
+.textarea:focus{
+    background-color: white;
+    box-shadow: none;
+}
