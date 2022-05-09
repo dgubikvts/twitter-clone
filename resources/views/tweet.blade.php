@@ -15,6 +15,16 @@
                     <div class="m-0 p-2 row position-relative">
                          <div class="col-2 p-0 mt-3 above">
                               <a href="/{{$aboveTweet->user->username}}"><img src="https://via.placeholder.com/50" alt="" class="rounded-circle"></a>
+                              <div class="d-flex justify-content-around">
+                                   <div class="d-flex flex-column">
+                                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                                   </div>
+                                   <div class=""></div>
+                              </div>
                          </div>
                          <div class="col-10 p-0 mt-3">
                               <div class="d-flex align-items-center">
@@ -37,23 +47,6 @@
                          <a href="{{ route('view.tweet', $aboveTweet) }}">
                               <span class="linkSpanner"></span>
                          </a>
-                    </div>
-                    <div class="d-flex justify-content-around">
-                         <div class="d-flex flex-column align-items-center">
-                              <i class="fa-solid fa-arrow-up"></i>
-                              <i class="fa-solid fa-ellipsis-vertical"></i>
-                              <i class="fa-solid fa-ellipsis-vertical"></i>
-                         </div>
-                         <div class="d-flex flex-column align-items-center">
-                              <i class="fa-solid fa-arrow-up"></i>
-                              <i class="fa-solid fa-ellipsis-vertical"></i>
-                              <i class="fa-solid fa-ellipsis-vertical"></i>
-                         </div>
-                         <div class="d-flex flex-column align-items-center">
-                              <i class="fa-solid fa-arrow-up"></i>
-                              <i class="fa-solid fa-ellipsis-vertical"></i>
-                              <i class="fa-solid fa-ellipsis-vertical"></i>
-                         </div>
                     </div>
                     @empty
                     @endforelse
