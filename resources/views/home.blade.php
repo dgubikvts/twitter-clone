@@ -25,7 +25,7 @@
                     <div class="d-flex align-items-center justify-content-between insert-before">
                          <div class="d-flex">
                               <div class="file-upload">
-                                   <input type="file" name="file" id="file" accept="image/*, video/*" onchange="loadFile(event)"><label for="file"><i class="fa-regular fa-image twitter-color me-2"></i></label>
+                                   <input type="file" name="file" id="file" accept="image/*, video/*" onchange="loadFile(this)"><label for="file"><i class="fa-regular fa-image twitter-color me-2"></i></label>
                               </div>
                          </div>
                          <div class="tweet">
@@ -83,14 +83,26 @@
 </div>
 
 <script>
-     var loadFile = function(event) {
+     function loadFile(fileInput){
           var div = document.getElementsByClassName('insert-before')[0];
           var parent = document.getElementsByClassName('parent')[0];
-          var img = document.createElement("img");
-          img.classList.add("p-2", "mb-2");
-          img.src = URL.createObjectURL(event.target.files[0]);
-          parent.insertBefore(img, div);
-     };
+          var files = fileInput.files;
+          var images = ['image/jpg', 'image/png', 'image/jpeg', 'image/gif'];
+          
+          if(images.includes(files[0].type)){
+               var img = document.createElement("img");
+               img.classList.add("p-2", "mb-2", "w-100");
+               img.src = URL.createObjectURL(files[0]);
+               parent.insertBefore(img, div);
+          }
+          else{
+               var video = document.createElement("video");
+               video.classList.add("p-2", "mb-2", "w-100");
+               video.src = URL.createObjectURL(files[0]);
+               video.setAttribute("controls","controls")   
+               parent.insertBefore(video, div);
+          }
+     }
 
      $(document).ready(function () {
         $('.comment').hover(function () {
