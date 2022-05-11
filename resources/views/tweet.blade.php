@@ -14,7 +14,7 @@
                     @forelse($aboveTweets as $aboveTweet)
                     <div class="m-0 p-2 row position-relative">
                          <div class="col-2 p-0 mt-3 above">
-                              <a href="/{{$aboveTweet->user->username}}"><img src="https://via.placeholder.com/50" alt="" class="rounded-circle"></a>
+                              <a href="/{{$aboveTweet->user->username}}"><img src="{{asset($aboveTweet->user->profileImage->path)}}" alt="" class="img profile-image rounded-circle"></a>
                               <div class="d-flex justify-content-around">
                                    <div class="d-flex flex-column">
                                         <i class="fa-solid fa-ellipsis-vertical"></i>
@@ -37,6 +37,15 @@
                                    </div>
                               @endif
                               <p class="lead mt-2">{{$aboveTweet->content}}</p>
+                              @if($aboveTweet->files)
+                                   @if($aboveTweet->files->type == 'image')
+                                   <img src="{{asset($aboveTweet->files->path)}}" width="100%" class="img rounded">
+                                   @elseif($aboveTweet->files->type == 'video')
+                                   <div class="position-relative above">
+                                        <video src="{{asset($aboveTweet->files->path)}}" controls width="100%"></video>
+                                   </div>
+                                   @endif
+                              @endif
                               <form action="{{ route('like', $aboveTweet) }}" method="POST" class="d-flex justify-content-between">
                                    @csrf
                                    <button type="submit" class="above btn rounded-pill me-2 hover"><i class="fa-heart {{App\Http\Controllers\PostsController::isLiked($aboveTweet) ? 'fa-solid' : 'fa-regular'}} text-danger me-2"></i>{{$aboveTweet->amountOfLikes}}</button>
@@ -52,11 +61,11 @@
                     @endforelse
                     <div class="d-flex mt-2">
                          <div class="col-2">
-                              <a href="/{{$entity->user->username}}"><img src="https://via.placeholder.com/50" alt="" class="rounded-circle"></a>
+                              <a href="/{{$entity->user->username}}"><img src="{{asset($entity->user->profileImage->path)}}" alt="" class="img profile-image rounded-circle"></a>
                          </div>
                          <div class="d-flex justify-content-center flex-column">
                               <a href="/{{$entity->user->username}}" class="username"><h5 class="m-0 me-3 fw-bold">{{$entity->user->name}}</h5></a>
-                              <h6 class="m-0"><a href="/{{$entity->username}}" class="text-decoration-none text-dark">{{'@'.$entity->user->username}}</a></h6>
+                              <h6 class="m-0"><a href="/{{$entity->user->username}}" class="text-decoration-none text-dark">{{'@'.$entity->user->username}}</a></h6>
                          </div>
                     </div>
                     <div class="mt-3">
@@ -66,6 +75,15 @@
                          </div>
                          @endif
                          <p class="lead mt-2">{{$entity->content}}</p>
+                         @if($entity->files)
+                              @if($entity->files->type == 'image')
+                              <img src="{{asset($entity->files->path)}}" width="100%" class="img rounded">
+                              @elseif($entity->files->type == 'video')
+                              <div class="position-relative above">
+                                   <video src="{{asset($entity->files->path)}}" controls width="100%"></video>
+                              </div>
+                              @endif
+                         @endif
                          <p class="py-3 m-0 border-bottom">Tweeted on: {{$entity->created_at}}</p>
                          <div class="d-flex justify-content-between align-items-center">
                               <button type="button" class="btn px-0" data-bs-toggle="modal" data-bs-target="#Likes{{$entity->id}}">{{$entity->amountOfLikes}} likes</button>
@@ -82,17 +100,17 @@
                     <form action="{{ route('comment', $entity) }}" method="POST" class="d-flex my-3 align-items-center row">
                          @csrf
                          <div class="col-2">
-                              <a href="/{{Auth::user()->username}}"><img src="https://via.placeholder.com/50" alt="" class="rounded-circle"></a>
+                              <a href="/{{Auth::user()->username}}"><img src="{{asset(Auth::user()->profileImage->path)}}" alt="" class="img profile-image rounded-circle"></a>
                          </div>
                          <div class="col-10 d-flex">
-                              <input type="text" name="comment" class="form-control me-2 border-0" maxlength="280" placeholder="Tweet your reply" style="background-color: white;" required>
+                              <input type="text" name="comment" class="form-control me-2 border-0" maxlength="280" placeholder="Tweet your reply" style="background-color: white;" autocomplete="off" required>
                               <button class="btn rounded-pill btn-outline-info dugme" type="submit">Reply</button>
                          </div>
                     </form>
                     @foreach($entity->comments_on_me as $comment)
                     <div class="border-top border-light m-0 row position-relative tweet">
                          <div class="col-2 p-0 mt-3 above">
-                              <a href="/{{$comment->entity->user->username}}"><img src="https://via.placeholder.com/50" alt="" class="rounded-circle"></a>
+                              <a href="/{{$comment->entity->user->username}}"><img src="{{asset($comment->entity->user->profileImage->path)}}" alt="" class="img profile-image rounded-circle"></a>
                          </div>
                          <div class="col-10 p-0 mt-3">
                               <div class="d-flex align-items-center">
@@ -103,6 +121,15 @@
                                    <h6 class="above">Replying to <a href="/{{$entity->user->username}}" class="text-decoration-none twitter-color">{{'@'.$entity->user->username}}</a></h6>
                               </div>
                               <p class="lead">{{$comment->entity->content}}</p>
+                              @if($comment->entity->files)
+                                   @if($comment->entity->files->type == 'image')
+                                   <img src="{{asset($comment->entity->files->path)}}" width="100%" class="img rounded">
+                                   @elseif($comment->entity->files->type == 'video')
+                                   <div class="position-relative above">
+                                        <video src="{{asset($comment->entity->files->path)}}" controls width="100%"></video>
+                                   </div>
+                                   @endif
+                              @endif
                               <form action="{{ route('like', $comment->entity) }}" method="POST" class="d-flex justify-content-between">
                                    @csrf
                                    <button type="submit" class="above btn rounded-pill me-2 hover"><i class="fa-heart {{App\Http\Controllers\PostsController::isLiked($comment->entity) ? 'fa-solid' : 'fa-regular'}} text-danger me-2"></i>{{$comment->entity->amountOfLikes}}</button>
@@ -141,7 +168,7 @@
                <div class="modal-body">
                     @forelse($entity->likes as $like)
                          <div class="d-flex mb-3 align-items-center position-relative">
-                              <img src="https://via.placeholder.com/50" alt="" class="rounded-circle me-3">
+                              <img src="{{asset($like->user->profileImage->path)}}" alt="" class="img profile-image rounded-circle me-3">
                               <div>
                                    <p class="m-0">{{$like->user->name}}</p>
                                    <p class="m-0">@<a href="/{{$like->user->username}}" class="text-decoration-none text-dark">{{$like->user->username}}</a></p>
@@ -149,7 +176,7 @@
                               @if($like->user->username !== Auth::user()->username)
                               <form action="{{ route('follow', $like->user) }}" method="POST" class="ms-auto above">
                                    @csrf
-                                   <button type="submit" class=" btn {{App\Http\Controllers\HomeController::isFollowing($like->user) ? 'btn-success' : 'btn-info'}} rounded-pill text-white">{{App\Http\Controllers\HomeController::isFollowing($like->user) ? 'Following' : 'Follow'}}</button>
+                                   <button type="submit" class="btn {{App\Http\Controllers\HomeController::isFollowing($like->user) ? 'btn-success' : 'btn-info'}} rounded-pill text-white">{{App\Http\Controllers\HomeController::isFollowing($like->user) ? 'Following' : 'Follow'}}</button>
                               </form>
                               @endif
                               <a href="/{{$like->user->username}}">

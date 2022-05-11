@@ -14,7 +14,7 @@
     box-shadow: 0 0 11px rgba(33,33,33,.2); 
 
 }
-img:hover{
+.img:hover{
     box-shadow: 0 0 11px rgba(33,33,33,.2); 
 }
 .above{
@@ -51,4 +51,21 @@ body{
 .textarea:focus{
     background-color: white;
     box-shadow: none;
+}
+.profile-image{
+    object-fit: cover;
+    width: 50px;
+    height: 50px;
+}
+.file-upload > input{
+    display: none;
+}
+.fa-image{
+    cursor: pointer;
+}
+.fa-film{
+    cursor: pointer;
+}
+p{
+    word-wrap: break-word;
 }

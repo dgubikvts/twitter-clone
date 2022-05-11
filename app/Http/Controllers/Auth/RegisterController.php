@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use App\Models\User;
+use App\Models\ProfileImage;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -54,6 +55,7 @@ class RegisterController extends Controller
             'username' => ['required', 'string', 'max:16', 'unique:users'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'profile_picture' => ['required', 'image'],
         ]);
     }
 
@@ -64,12 +66,23 @@ class RegisterController extends Controller
      * @return \App\Models\User
      */
     protected function create(array $data)
-    {
-        return User::create([
+    {        
+        $user = User::create([
             'name' => $data['name'],
             'username' => $data['username'],
             'email' => $data['email'],
-            'password' => Hash::make($data['password']),
+            'password' => Hash::make($data['password'])
         ]);
+
+        $request = request();
+        $file = $request->file('profile_picture');
+        $file_name = $file->getClientOriginalName();
+        $file_size = $file->getSize();
+        $path = 'storage/images/profile/' . $user->id . '/' . $file_name;
+        $file->storeAs('public/images/profile/' . $user->id, $file_name);
+        $pfp = new ProfileImage();
+        $pfp->create($user->id, $file_name, $file_size, $path);
+
+        return $user;
     }
 }

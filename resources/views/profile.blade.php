@@ -12,7 +12,7 @@
           <div class="col-5 border p-0">
                <div class="border border-light m-0 p-2 row">
                     <div class="col-4 p-0 justify-content-center">
-                         <img src="https://via.placeholder.com/150" alt="" class="rounded-circle mx-auto d-block">
+                         <img src="{{asset($user->profileImage->path)}}" width="150px" height="150px" style="object-fit: cover;" class="img rounded-circle mx-auto d-block">
                          <div class="offset-2 mt-3">
                               <h5 class="m-0">{{$user->name}}</h5>
                               <h6>@<a>{{$user->username}}</a></h6>
@@ -31,7 +31,7 @@
                @if($tweet->post)
                <div class="border-bottom border-light m-0 p-2 row position-relative tweet">
                     <div class="col-2 p-0 mt-3 above">
-                         <a href="/{{$tweet->user->username}}"><img src="https://via.placeholder.com/50" alt="" class="rounded-circle mx-auto d-block"></a>
+                         <a href="/{{$tweet->user->username}}"><img src="{{asset($tweet->user->profileImage->path)}}" alt="" class="img profile-image rounded-circle mx-auto d-block"></a>
                     </div>
                     <div class="col-10 p-0 mt-3">
                          <div class="d-flex align-items-center">
@@ -39,6 +39,15 @@
                               <h6 class="m-0 above"><a href="/{{$tweet->user->username}}" class="text-decoration-none atcolor">{{'@'.$tweet->user->username}}</a></h6>
                          </div>
                          <p class="lead mt-2">{{$tweet->content}}</p>
+                         @if($tweet->files)
+                              @if($tweet->files->type == 'image')
+                              <img src="{{asset($tweet->files->path)}}" width="100%" class="img rounded mb-2">
+                              @elseif($tweet->files->type == 'video')
+                              <div class="position-relative above">
+                                   <video src="{{asset($tweet->files->path)}}" controls width="100%"></video>
+                              </div>
+                              @endif
+                         @endif
                          <form action="{{ route('like', $tweet) }}" method="POST" class="d-flex justify-content-between">
                               @csrf
                               <button type="submit" class="above btn rounded-pill me-2 hover"><i class="fa-heart {{App\Http\Controllers\PostsController::isLiked($tweet) ? 'fa-solid' : 'fa-regular'}} text-danger me-2"></i>{{$tweet->amountOfLikes}}</button>
@@ -77,7 +86,7 @@
                <div class="modal-body">
                     @forelse($user->following as $follow)
                          <div class="d-flex mb-3 align-items-center">
-                              <a href="/{{$follow->followee->username}}"><img src="https://via.placeholder.com/50" alt="" class="rounded-circle me-3"></a>
+                              <a href="/{{$follow->followee->username}}"><img src="{{asset($follow->followee->profileImage->path)}}" alt="" class="img profile-image rounded-circle me-3"></a>
                               <div>
                                    <a href="/{{$follow->followee->username}}" class="username"><p class="m-0">{{$follow->followee->name}}</p></a>
                                    <p class="m-0">@<a href="/{{$follow->followee->username}}" class="text-decoration-none text-dark">{{$follow->followee->username}}</a></p>
@@ -110,7 +119,7 @@
                <div class="modal-body">
                     @forelse($user->followers as $follow)
                          <div class="d-flex mb-3 align-items-center">
-                              <a href="/{{$follow->follower->username}}"><img src="https://via.placeholder.com/50" alt="" class="rounded-circle me-3"></a>
+                              <a href="/{{$follow->follower->username}}"><img src="{{asset($follow->follower->profileImage->path)}}" alt="" class="img profile-image rounded-circle me-3"></a>
                               <div>
                                    <a href="/{{$follow->follower->username}}" class="username"><p class="m-0">{{$follow->follower->name}}</p></a>
                                    <p class="m-0">@<a href="/{{$follow->follower->username}}" class="text-decoration-none text-dark">{{$follow->follower->username}}</a></p>
