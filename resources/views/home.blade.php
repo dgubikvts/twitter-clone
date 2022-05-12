@@ -21,7 +21,7 @@
                     <a href="/{{Auth::user()->username}}"><img src="{{asset(Auth::user()->profileImage->path)}}" alt="" class="img profile-image rounded-circle mx-auto d-block"></a>
                </div>
                <div class="d-flex col-10 flex-column parent">
-                    <textarea name="content" class="border-0 form-control textarea" maxlength="280" rows="1" placeholder="What's happening?" required></textarea>
+                    <textarea name="content" class="border-0 form-control textarea" maxlength="280" rows="3" placeholder="What's happening?" required></textarea>
                     <div class="d-flex align-items-center justify-content-between insert-before">
                          <div class="d-flex">
                               <div class="file-upload">
@@ -114,48 +114,21 @@
                parent.insertBefore(insideDiv, div);
           }
           updateFileList();
-
-          
           console.log(fileList);
-          //file.push()
-          // var div = document.getElementsByClassName('insert-before')[0];
-          // var parent = document.getElementsByClassName('parent')[0];
-          // var files = fileInput.files;
-          // var images = ['image/jpg', 'image/png', 'image/jpeg', 'image/gif'];
-          // if(images.includes(files[files.length - 1].type)){
-          //      var insideDiv = document.createElement("div");
-          //      insideDiv.classList.add("col-12", "mb-2", "p-2", "position-relative");
-          //      insideDiv.innerHTML = 
-          //      `<img src='${URL.createObjectURL(files[files.length - 1])}' class='w-100' />
-          //      <button type="button" onclick="deleteFile(${files.length - 1})" class="btn p-0 delete-btn"><i class="fa-regular fa-circle-xmark display-4 x-dugme"></i></button>
-          //      `;
-          //      parent.insertBefore(insideDiv, div);
-          // }
-          // else{
-          //      var video = document.createElement("video");
-          //      video.classList.add("p-2", "mb-2", "w-100");
-          //      video.src = URL.createObjectURL(files[0]);
-          //      video.setAttribute("controls","controls")   
-          //      parent.insertBefore(video, div);
-          // }
      }
 
 
      function updateFileList(){
           dataTransfer.items.clear();
           fileList.forEach(function(file){
-               dataTransfer.items.add(file)
+               if(typeof file !== "undefined") dataTransfer.items.add(file)
           });
           fileInput.files = dataTransfer.files;
      }
 
      function deleteFile(id){
-          fileList.splice(id, 1);
+          fileList[id] = undefined;
           var div = document.getElementsByClassName(`div${id}`)[0];
-          // var image = document.getElementById(`img${id}`);
-          // var button = document.getElementById(`btn${id}`);
-          // image.remove();
-          // button.remove();
           div.remove();
           updateFileList();
           console.log(fileList);
@@ -179,19 +152,13 @@
      $("#upload-files").submit(function(e){
           e.preventDefault();
           console.log(fileInput.files);
-          
           var formData = new FormData(this);
-          let TotalFiles = $('#file')[0].files.length; //Total files
-          let files = $('#file')[0];
-          for (let i = 0; i < TotalFiles; i++) {
-               formData.append('files' + i, files.files[i]);
+          for (let i = 0; i < fileInput.files.length; i++) {
+               formData.append('files' + i, fileInput.files[i]);
           }
 
           console.log(formData);
-     
           
-
-
           $.ajaxSetup({
                headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -208,6 +175,9 @@
                success: function (response) {
                     location.reload();
                
+               },
+               error: function(response){
+                    console.log(response.errors);
                }
           });
      });

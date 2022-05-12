@@ -21,6 +21,11 @@ class PostsController extends Controller
     public function tweet(Request $request){
         $request->validate([
             'content' => 'required',
+            'files.*' => 'mimetypes:image/gif,image/jpeg,image/png,video/x-ms-asf,video/x-flv,video/mp4,application/x-mpegURL,video/MP2T,video/3gpp,video/quicktime,video/x-msvideo,video/x-ms-wmv,video/avi|max:20000',
+            [
+                'image_file.*.mimes' => 'Only jpeg, png and gif images are allowed, and all video types',
+                'image_file.*.max' => 'Sorry! Maximum allowed size for a file is 20MB',
+            ]
             //'files' => 'mimetypes:image/gif,image/jpeg,image/png,video/x-ms-asf,video/x-flv,video/mp4,application/x-mpegURL,video/MP2T,video/3gpp,video/quicktime,video/x-msvideo,video/x-ms-wmv,video/avi',
         ]);
         $entity = new Entity;

@@ -40,13 +40,15 @@
                          </div>
                          <p class="lead mt-2">{{$tweet->content}}</p>
                          @if($tweet->files)
-                              @if($tweet->files->type == 'image')
-                              <img src="{{asset($tweet->files->path)}}" width="100%" class="img rounded mb-2">
-                              @elseif($tweet->files->type == 'video')
-                              <div class="position-relative above">
-                                   <video src="{{asset($tweet->files->path)}}" controls width="100%"></video>
-                              </div>
-                              @endif
+                              @foreach($tweet->files as $file)
+                                   @if($file->type == 'image')
+                                   <img src="{{asset($file->path)}}" width="100%" class="img rounded mb-2">
+                                   @elseif($file->type == 'video')
+                                   <div class="position-relative above">
+                                        <video src="{{asset($file->path)}}" controls width="100%"></video>
+                                   </div>
+                                   @endif
+                              @endforeach
                          @endif
                          <form action="{{ route('like', $tweet) }}" method="POST" class="d-flex justify-content-between">
                               @csrf

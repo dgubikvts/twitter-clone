@@ -38,13 +38,15 @@
                               @endif
                               <p class="lead mt-2">{{$aboveTweet->content}}</p>
                               @if($aboveTweet->files)
-                                   @if($aboveTweet->files->type == 'image')
-                                   <img src="{{asset($aboveTweet->files->path)}}" width="100%" class="img rounded">
-                                   @elseif($aboveTweet->files->type == 'video')
-                                   <div class="position-relative above">
-                                        <video src="{{asset($aboveTweet->files->path)}}" controls width="100%"></video>
-                                   </div>
-                                   @endif
+                                   @foreach($aboveTweet->files as $file)
+                                        @if($file->type == 'image')
+                                        <img src="{{asset($file->path)}}" width="100%" class="img rounded">
+                                        @elseif($file->type == 'video')
+                                        <div class="position-relative above">
+                                             <video src="{{asset($file->path)}}" controls width="100%"></video>
+                                        </div>
+                                        @endif
+                                   @endforeach
                               @endif
                               <form action="{{ route('like', $aboveTweet) }}" method="POST" class="d-flex justify-content-between">
                                    @csrf
@@ -76,13 +78,15 @@
                          @endif
                          <p class="lead mt-2">{{$entity->content}}</p>
                          @if($entity->files)
-                              @if($entity->files->type == 'image')
-                              <img src="{{asset($entity->files->path)}}" width="100%" class="img rounded">
-                              @elseif($entity->files->type == 'video')
-                              <div class="position-relative above">
-                                   <video src="{{asset($entity->files->path)}}" controls width="100%"></video>
-                              </div>
-                              @endif
+                              @foreach($entity->files as $file)
+                                   @if($file->type == 'image')
+                                   <img src="{{asset($file->path)}}" width="100%" class="img rounded mb-2">
+                                   @elseif($file->type == 'video')
+                                   <div class="position-relative above">
+                                        <video src="{{asset($file->path)}}" controls width="100%"></video>
+                                   </div>
+                                   @endif
+                              @endforeach
                          @endif
                          <p class="py-3 m-0 border-bottom">Tweeted on: {{$entity->created_at}}</p>
                          <div class="d-flex justify-content-between align-items-center">
@@ -122,13 +126,15 @@
                               </div>
                               <p class="lead">{{$comment->entity->content}}</p>
                               @if($comment->entity->files)
-                                   @if($comment->entity->files->type == 'image')
-                                   <img src="{{asset($comment->entity->files->path)}}" width="100%" class="img rounded">
-                                   @elseif($comment->entity->files->type == 'video')
-                                   <div class="position-relative above">
-                                        <video src="{{asset($comment->entity->files->path)}}" controls width="100%"></video>
-                                   </div>
-                                   @endif
+                                   @foreach($comment->entity->files as $file)
+                                        @if($file->type == 'image')
+                                        <img src="{{asset($file->path)}}" width="100%" class="img rounded">
+                                        @elseif($file->type == 'video')
+                                        <div class="position-relative above">
+                                             <video src="{{asset($file->path)}}" controls width="100%"></video>
+                                        </div>
+                                        @endif
+                                   @endforeach
                               @endif
                               <form action="{{ route('like', $comment->entity) }}" method="POST" class="d-flex justify-content-between">
                                    @csrf
