@@ -15,7 +15,7 @@
           {{ $error }}
           </div>
           @endforeach
-          <form action="{{ route('tweet') }}" method="POST" class="d-flex mt-3 p-2 border-bottom border-light" enctype="multipart/form-data" runat="server">
+          <form action="{{ route('tweet') }}" method="POST" class="d-flex mt-3 p-2 border-bottom border-light" enctype="multipart/form-data" id="upload-files">
                @csrf
                <div class="col-2">
                     <a href="/{{Auth::user()->username}}"><img src="{{asset(Auth::user()->profileImage->path)}}" alt="" class="img profile-image rounded-circle mx-auto d-block"></a>
@@ -25,7 +25,7 @@
                     <div class="d-flex align-items-center justify-content-between insert-before">
                          <div class="d-flex">
                               <div class="file-upload">
-                                   <input type="file" name="file" id="file" accept="image/*, video/*" onchange="loadFile(this)"><label for="file"><i class="fa-regular fa-image twitter-color me-2"></i></label>
+                                   <input type="file" name="files[]" id="file" accept="image/*, video/*" onchange="loadFile(this)" multiple><label for="file"><i class="fa-regular fa-image twitter-color me-2"></i></label>
                               </div>
                          </div>
                          <div class="tweet">
@@ -47,13 +47,16 @@
                     </div>
                     <p class="lead mt-2">{{$entity->content}}</p>
                     @if($entity->files)
-                         @if($entity->files->type == 'image')
-                         <img src="{{asset($entity->files->path)}}" width="100%" class="img rounded mb-2">
-                         @elseif($entity->files->type == 'video')
-                         <div class="position-relative above">
-                              <video src="{{asset($entity->files->path)}}" class="w-100" controls></video>
-                         </div>
-                         @endif
+                         @foreach($entity->files as $file)
+                              @if($file->type == 'image')
+                              <img src="{{asset($file->path)}}" width="100%" class="img rounded mb-2">
+                              @elseif($file->type == 'video')
+                              <div class="position-relative above">
+                                   <video src="{{asset($file->path)}}" class="w-100" controls></video>
+                              </div>
+                              @endif
+                         @endforeach
+                         
                     @endif
                     <form action="{{ route('like', $entity) }}" method="POST" class="d-flex justify-content-between">
                          @csrf
@@ -83,25 +86,79 @@
 </div>
 
 <script>
+     var fileList = [];
+     var fileInput = document.getElementById('file');
+     var dataTransfer = new DataTransfer();
+          
+
      function loadFile(fileInput){
           var div = document.getElementsByClassName('insert-before')[0];
           var parent = document.getElementsByClassName('parent')[0];
-          var files = fileInput.files;
           var images = ['image/jpg', 'image/png', 'image/jpeg', 'image/gif'];
+          for(var i = 0; i < fileInput.files.length; i++){
+               fileList.push(fileInput.files[i]);
+               var insideDiv = document.createElement("div");
+               insideDiv.classList.add("col-12", "mb-2", "p-2", "position-relative", `div${fileList.length - 1}`);
+               if(images.includes(fileInput.files[i].type)){
+                    insideDiv.innerHTML += 
+                    `<img src='${URL.createObjectURL(fileInput.files[i])}' class='w-100'"/>
+                    <button type="button" onclick="deleteFile(${fileList.length - 1})" class="btn p-0 delete-btn"><i class="fa-regular fa-circle-xmark display-4 x-dugme"></i></button>
+                    `;
+               }
+               else{
+                    insideDiv.innerHTML += 
+                    `<video class='w-100' controls src='${URL.createObjectURL(fileInput.files[i])}'></video>
+                    <button type="button" onclick="deleteFile(${fileList.length - 1})" class="btn p-0 delete-btn"><i class="fa-regular fa-circle-xmark display-4 x-dugme"></i></button>
+                    `;
+               }
+               parent.insertBefore(insideDiv, div);
+          }
+          updateFileList();
+
           
-          if(images.includes(files[0].type)){
-               var img = document.createElement("img");
-               img.classList.add("p-2", "mb-2", "w-100");
-               img.src = URL.createObjectURL(files[0]);
-               parent.insertBefore(img, div);
-          }
-          else{
-               var video = document.createElement("video");
-               video.classList.add("p-2", "mb-2", "w-100");
-               video.src = URL.createObjectURL(files[0]);
-               video.setAttribute("controls","controls")   
-               parent.insertBefore(video, div);
-          }
+          console.log(fileList);
+          //file.push()
+          // var div = document.getElementsByClassName('insert-before')[0];
+          // var parent = document.getElementsByClassName('parent')[0];
+          // var files = fileInput.files;
+          // var images = ['image/jpg', 'image/png', 'image/jpeg', 'image/gif'];
+          // if(images.includes(files[files.length - 1].type)){
+          //      var insideDiv = document.createElement("div");
+          //      insideDiv.classList.add("col-12", "mb-2", "p-2", "position-relative");
+          //      insideDiv.innerHTML = 
+          //      `<img src='${URL.createObjectURL(files[files.length - 1])}' class='w-100' />
+          //      <button type="button" onclick="deleteFile(${files.length - 1})" class="btn p-0 delete-btn"><i class="fa-regular fa-circle-xmark display-4 x-dugme"></i></button>
+          //      `;
+          //      parent.insertBefore(insideDiv, div);
+          // }
+          // else{
+          //      var video = document.createElement("video");
+          //      video.classList.add("p-2", "mb-2", "w-100");
+          //      video.src = URL.createObjectURL(files[0]);
+          //      video.setAttribute("controls","controls")   
+          //      parent.insertBefore(video, div);
+          // }
+     }
+
+
+     function updateFileList(){
+          dataTransfer.items.clear();
+          fileList.forEach(function(file){
+               dataTransfer.items.add(file)
+          });
+          fileInput.files = dataTransfer.files;
+     }
+
+     function deleteFile(id){
+          fileList.splice(id, 1);
+          var div = document.getElementsByClassName(`div${id}`)[0];
+          // var image = document.getElementById(`img${id}`);
+          // var button = document.getElementById(`btn${id}`);
+          // image.remove();
+          // button.remove();
+          div.remove();
+          updateFileList();
+          console.log(fileList);
      }
 
      $(document).ready(function () {
@@ -116,6 +173,45 @@
           function(){
           $(this).parent().parent().css("background-color", "white");
           });
+
+
+
+     $("#upload-files").submit(function(e){
+          e.preventDefault();
+          console.log(fileInput.files);
+          
+          var formData = new FormData(this);
+          let TotalFiles = $('#file')[0].files.length; //Total files
+          let files = $('#file')[0];
+          for (let i = 0; i < TotalFiles; i++) {
+               formData.append('files' + i, files.files[i]);
+          }
+
+          console.log(formData);
+     
+          
+
+
+          $.ajaxSetup({
+               headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+               }
+          });
+          $.ajax({
+               type: 'POST',
+               url: "{{route('tweet')}}",
+               data: formData,
+               cache:false,
+               contentType: false,
+               processData: false,
+               dataType: 'json',
+               success: function (response) {
+                    location.reload();
+               
+               }
+          });
+     });
+
     });
 </script>
 

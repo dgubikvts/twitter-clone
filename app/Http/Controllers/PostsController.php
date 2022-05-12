@@ -21,7 +21,7 @@ class PostsController extends Controller
     public function tweet(Request $request){
         $request->validate([
             'content' => 'required',
-            'file' => 'mimetypes:image/gif,image/jpeg,image/png,video/x-ms-asf,video/x-flv,video/mp4,application/x-mpegURL,video/MP2T,video/3gpp,video/quicktime,video/x-msvideo,video/x-ms-wmv,video/avi',
+            //'files' => 'mimetypes:image/gif,image/jpeg,image/png,video/x-ms-asf,video/x-flv,video/mp4,application/x-mpegURL,video/MP2T,video/3gpp,video/quicktime,video/x-msvideo,video/x-ms-wmv,video/avi',
         ]);
         $entity = new Entity;
         $entity->save();
@@ -32,20 +32,21 @@ class PostsController extends Controller
         $tweet->save();
         $entity->save();
 
-        if($request->hasFile('file')){
-            $file = $request->file('file');
-            $file_name = $file->getClientOriginalName();
-            $file_size = $file->getSize();
-            $file_extension = $file->getClientOriginalExtension();
-            if($file_extension == 'png' || $file_extension == 'jpg' || $file_extension == 'jpeg' || $file_extension == 'gif') $file_type = 'image';
-            else $file_type = 'video';
-            $path = 'storage/files/' . $entity->id . '/' . $file_name;
-            $file->storeAs('public/files/' . $entity->id, $file_name);
-            $new_file = new EntityFile();
-            $new_file->create($entity->id, $file_name, $file_size, $path, $file_type);
+        if($request->has('files')){
+            foreach($request->file('files') as $file){
+                $file_name = $file->getClientOriginalName();
+                $file_size = $file->getSize();
+                $file_extension = $file->getClientOriginalExtension();
+                if($file_extension == 'png' || $file_extension == 'jpg' || $file_extension == 'jpeg' || $file_extension == 'gif') $file_type = 'image';
+                else $file_type = 'video';
+                $path = 'storage/files/' . $entity->id . '/' . $file_name;
+                $file->storeAs('public/files/' . $entity->id, $file_name);
+                $new_file = new EntityFile();
+                $new_file->create($entity->id, $file_name, $file_size, $path, $file_type);
+            }
         }
-
-        return redirect('/home');
+        return response()->json();
+       
     }
 
     public function viewTweet(Entity $entity){

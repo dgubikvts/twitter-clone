@@ -36,6 +36,6 @@ class Entity extends Model
     }
 
     public function files(){
-        return $this->hasOne(EntityFile::class);
+        return $this->hasMany(EntityFile::class);
     }
 }
