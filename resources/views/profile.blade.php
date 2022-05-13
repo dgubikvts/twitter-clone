@@ -4,10 +4,10 @@
 <div class="container">
      <div class="row">
           <div class="col-3">
-               <h3 class="mb-4"><a href="/home" class="text-decoration-none text-dark">Home</a></h3>
-               <h3 class="mb-4"><a href="" class="text-decoration-none text-dark">Messages</a></h3>
-               <h3 class="mb-4"><a href="{{ route('profile', Auth::user()->username) }}" class="text-decoration-none text-dark">Profile</a></h3>
-               <h3 class="mb-4"><a class="text-decoration-none text-dark" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">{{ __('Logout') }}</a></h3>
+               <h3 class="mb-4"><a href="/home" class="text-decoration-none text-dark p-2 rounded-pill link-hover"><i class="fa-solid fa-house me-2"></i>Home</a></h3>
+               <h3 class="mb-4"><a href="" class="text-decoration-none text-dark p-2 rounded-pill link-hover"><i class="fa-solid fa-envelope me-2"></i>Messages</a></h3>
+               <h3 class="mb-4"><a href="{{ route('profile', Auth::user()->username) }}" class="text-decoration-none text-dark p-2 rounded-pill link-hover fw-bold"><i class="fa-solid fa-user me-2 twitter-color"></i>Profile</a></h3>
+               <h3 class="mb-4"><a class="text-decoration-none text-dark p-2 rounded-pill link-hover" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i class="fa-solid fa-arrow-right-from-bracket me-2"></i>{{ __('Logout') }}</a></h3>
           </div>
           <div class="col-5 border p-0">
                <div class="border border-light m-0 p-2 row">
@@ -30,8 +30,8 @@
                @foreach($user->entities as $tweet)
                @if($tweet->post)
                <div class="border-bottom border-light m-0 p-2 row position-relative tweet">
-                    <div class="col-2 p-0 mt-3 above">
-                         <a href="/{{$tweet->user->username}}"><img src="{{asset($tweet->user->profileImage->path)}}" alt="" class="img profile-image rounded-circle mx-auto d-block"></a>
+                    <div class="col-2 p-0 mt-3 d-flex flex-column">
+                         <a href="/{{$tweet->user->username}}" class="above"><img src="{{asset($tweet->user->profileImage->path)}}" alt="" class="img profile-image rounded-circle mx-auto d-block"></a>
                     </div>
                     <div class="col-10 p-0 mt-3">
                          <div class="d-flex align-items-center">
@@ -64,16 +64,16 @@
                @endif
                @endforeach
           </div>
-     <div class="col-4">
-          <form action="" method="GET">
-          <div class="input-group mb-3">
-               <input type="text" class="form-control border-info" placeholder="Search..." >
-               <div class="btn btn-outline-info"><i class="fa-solid fa-magnifying-glass"></i></div>
+          <div class="col-3">
+               <form action="" method="GET">
+                    <div class="input-group mb-3">
+                         <input  type="text" class="form-control border-info rounded-pill" placeholder="Search..." aria-describedby="button-addon">
+                         <button class="btn btn-outline-secondary d-none" type="button" id="button-addon">Button</button>
+                    </div>
+               </form>
           </div>
-          </form>
      </div>
 </div>
-
 
 
 <!-- MODALS -->

@@ -4,12 +4,12 @@
 <div class="container">
      <div class="row">
        <div class="col-3">
-          <h3 class="mb-4"><a href="/home" class="text-decoration-none text-dark">Home</a></h3>
-          <h3 class="mb-4"><a href="" class="text-decoration-none text-dark">Messages</a></h3>
-          <h3 class="mb-4"><a href="{{ route('profile', Auth::user()->username) }}" class="text-decoration-none text-dark">Profile</a></h3>
-          <h3 class="mb-4"><a class="text-decoration-none text-dark" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">{{ __('Logout') }}</a></h3>
+          <h3 class="mb-4"><a href="/home" class="text-decoration-none text-dark p-2 rounded-pill link-hover fw-bold"><i class="fa-solid fa-house me-2 twitter-color"></i>Home</a></h3>
+          <h3 class="mb-4"><a href="" class="text-decoration-none text-dark p-2 rounded-pill link-hover"><i class="fa-solid fa-envelope me-2"></i>Messages</a></h3>
+          <h3 class="mb-4"><a href="{{ route('profile', Auth::user()->username) }}" class="text-decoration-none text-dark p-2 rounded-pill link-hover"><i class="fa-solid fa-user me-2"></i>Profile</a></h3>
+          <h3 class="mb-4"><a class="text-decoration-none text-dark p-2 rounded-pill link-hover" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i class="fa-solid fa-arrow-right-from-bracket me-2"></i>{{ __('Logout') }}</a></h3>
        </div>
-       <div class="col-5 border-top border-start border-end border-light p-0">
+       <div class="col-5 border-top border-start border-end border-light p-0 start-section">
           @foreach ($errors->all() as $error)
           <div class="alert alert-danger" role="alert">
           {{ $error }}
@@ -23,13 +23,11 @@
                <div class="d-flex col-10 flex-column parent">
                     <textarea name="content" class="border-0 form-control textarea" maxlength="280" rows="3" placeholder="What's happening?" required></textarea>
                     <div class="d-flex align-items-center justify-content-between insert-before">
-                         <div class="d-flex">
-                              <div class="file-upload">
-                                   <input type="file" name="files[]" id="file" accept="image/*, video/*" onchange="loadFile(this)" multiple><label for="file"><i class="fa-regular fa-image twitter-color me-2"></i></label>
-                              </div>
+                         <div class="file-upload">
+                              <input type="file" name="files[]" id="file" accept="image/*, video/*" onchange="loadFile(this)" multiple><label for="file"><i class="fa-regular fa-image me-2 btn rounded-pill upload-file twitter-color"></i></label>
                          </div>
                          <div class="tweet">
-                              <button type="submit" name="action" value="{{ route('tweet') }}" class="btn dugme rounded-pill text-white me-2">Tweet</button>
+                              <button type="submit" class="btn dugme rounded-pill text-white me-2">Tweet</button>
                          </div>
                     </div>
                </div>
@@ -37,8 +35,8 @@
           @forelse($entities as $entity)
           @if($entity->post)
           <div class="border-bottom border-light m-0 p-2 row position-relative">
-               <div class="col-2 p-0 mt-3 above">
-                    <a href="/{{$entity->user->username}}"><img src="{{asset($entity->user->profileImage->path)}}" alt="" class="img profile-image rounded-circle mx-auto d-block"></a>
+               <div class="col-2 p-0 mt-3 d-flex flex-column">
+                    <a href="/{{$entity->user->username}}" class="above"><img src="{{asset($entity->user->profileImage->path)}}" alt="" class="img profile-image rounded-circle mx-auto d-block"></a>
                </div>
                <div class="col-10 p-0 mt-3">
                     <div class="d-flex align-items-center">
@@ -61,7 +59,7 @@
                     <form action="{{ route('like', $entity) }}" method="POST" class="d-flex justify-content-between">
                          @csrf
                          <button type="submit" class="above btn rounded-pill me-2 hover"><i class="fa-heart {{App\Http\Controllers\PostsController::isLiked($entity) ? 'fa-solid' : 'fa-regular'}} text-danger me-2"></i>{{$entity->amountOfLikes}}</button>
-                         <button type="button" class="above btn rounded-pill comment hover"><i class="fa-regular fa-comment comment-icon me-2"></i>{{$entity->amountOfComments}}</button>
+                         <button type="button" class="above btn rounded-pill comment hover"><i class="fa-regular fa-comment me-2"></i>{{$entity->amountOfComments}}</button>
                          <button type="button" class="above btn rounded-pill hover"><i class="fa-solid fa-retweet me-2"></i></button>
                     </form>
                </div>
@@ -76,10 +74,10 @@
        </div>
        <div class="col-3">
           <form action="" method="GET">
-          <div class="input-group mb-3">
-               <input type="text" class="form-control border-info" placeholder="Search..." >
-               <div class="btn btn-outline-info"><i class="fa-solid fa-magnifying-glass"></i></div>
-          </div>
+               <div class="input-group mb-3">
+                    <input  type="text" class="form-control border-info rounded-pill" placeholder="Search..." aria-describedby="button-addon">
+                    <button class="btn btn-outline-secondary d-none" type="button" id="button-addon">Button</button>
+               </div>
           </form>
        </div>
     </div>
@@ -89,12 +87,11 @@
      var fileList = [];
      var fileInput = document.getElementById('file');
      var dataTransfer = new DataTransfer();
-          
 
      function loadFile(fileInput){
           var div = document.getElementsByClassName('insert-before')[0];
           var parent = document.getElementsByClassName('parent')[0];
-          var images = ['image/jpg', 'image/png', 'image/jpeg', 'image/gif'];
+          var images = ['image/jpg', 'image/png', 'image/jpeg', 'image/gif', 'image/bmp'];
           for(var i = 0; i < fileInput.files.length; i++){
                fileList.push(fileInput.files[i]);
                var insideDiv = document.createElement("div");
@@ -114,7 +111,6 @@
                parent.insertBefore(insideDiv, div);
           }
           updateFileList();
-          console.log(fileList);
      }
 
 
@@ -131,7 +127,6 @@
           var div = document.getElementsByClassName(`div${id}`)[0];
           div.remove();
           updateFileList();
-          console.log(fileList);
      }
 
      $(document).ready(function () {
@@ -151,13 +146,10 @@
 
      $("#upload-files").submit(function(e){
           e.preventDefault();
-          console.log(fileInput.files);
           var formData = new FormData(this);
           for (let i = 0; i < fileInput.files.length; i++) {
                formData.append('files' + i, fileInput.files[i]);
           }
-
-          console.log(formData);
           
           $.ajaxSetup({
                headers: {
@@ -174,11 +166,21 @@
                dataType: 'json',
                success: function (response) {
                     location.reload();
-               
                },
-               error: function(response){
-                    console.log(response.errors);
+               statusCode: {
+                    422: function(data) {
+                         $('.start-section').prepend(`
+                         <div class='alert alert-danger'>
+                              <p class='m-0 text-center'>
+                                   Incorrect file type!
+                              </p>
+                         </div>`);
+                         $(".alert").delay(2000).fadeOut(1000, function() {
+                            $( this ).remove();
+                         });
+                    }  
                }
+               
           });
      });
 

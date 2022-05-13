@@ -23,4 +23,4 @@ Route::get('/tweet/{entity}', 'App\Http\Controllers\PostsController@viewTweet')-
 Route::get('/{username}', 'App\Http\Controllers\HomeController@profile')->name('profile');
 Route::post('/follow/{user}', 'App\Http\Controllers\HomeController@follow')->name('follow');
 Route::post('/like/{entity}', 'App\Http\Controllers\PostsController@like')->name('like');
-Route::post('/comment/{entity}', 'App\Http\Controllers\PostsController@comment')->name('comment');
+Route::post('/comment', 'App\Http\Controllers\PostsController@comment')->name('comment');

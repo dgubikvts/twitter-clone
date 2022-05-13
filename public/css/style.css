@@ -12,7 +12,9 @@
 }   
 .hover:hover{
     box-shadow: 0 0 11px rgba(33,33,33,.2); 
-
+}
+.link-hover:hover{
+    background-color: #E1E8ED;
 }
 .img:hover{
     box-shadow: 0 0 11px rgba(33,33,33,.2); 
@@ -77,4 +79,11 @@ body{
 }
 p{
     word-wrap: break-word;
+}
+.upload-file:hover{
+    box-shadow: 0 0 11px rgba(33,33,33,.2); 
+    color: #1DA1F2;
+}
+.vr{
+    width: 2px;
 }

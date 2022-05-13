@@ -28,7 +28,7 @@ class Entity extends Model
     }
 
     public function comments_on_me(){
-        return $this->hasMany(Comment::class, 'commented_on');
+        return $this->hasMany(Comment::class, 'commented_on')->orderByDesc('created_at');
     }
 
     public function likes(){
