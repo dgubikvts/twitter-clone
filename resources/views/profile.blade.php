@@ -1,80 +1,59 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-     <div class="row">
-          <div class="col-3">
-               <h3 class="mb-4"><a href="/home" class="text-decoration-none text-dark p-2 rounded-pill link-hover"><i class="fa-solid fa-house me-2"></i>Home</a></h3>
-               <h3 class="mb-4"><a href="" class="text-decoration-none text-dark p-2 rounded-pill link-hover"><i class="fa-solid fa-envelope me-2"></i>Messages</a></h3>
-               <h3 class="mb-4"><a href="{{ route('profile', Auth::user()->username) }}" class="text-decoration-none text-dark p-2 rounded-pill link-hover fw-bold"><i class="fa-solid fa-user me-2 twitter-color"></i>Profile</a></h3>
-               <h3 class="mb-4"><a class="text-decoration-none text-dark p-2 rounded-pill link-hover" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i class="fa-solid fa-arrow-right-from-bracket me-2"></i>{{ __('Logout') }}</a></h3>
-          </div>
-          <div class="col-5 border p-0">
-               <div class="border border-light m-0 p-2 row">
-                    <div class="col-4 p-0 justify-content-center">
-                         <img src="{{asset($user->profileImage->path)}}" width="150px" height="150px" style="object-fit: cover;" class="img rounded-circle mx-auto d-block">
-                         <div class="offset-2 mt-3">
-                              <h5 class="m-0">{{$user->name}}</h5>
-                              <h6>@<a>{{$user->username}}</a></h6>
-                         </div>
-                    </div>
-                    <form action="{{ route('follow', $user) }}" method="POST" class="col-8 d-flex justify-content-end align-items-end">
-                         @csrf
-                         <button type="button" class="above btn username" data-bs-toggle="modal" data-bs-target="#Following{{$user->id}}">{{$user->following->count()}} Following</button>
-                         <button type="button" class="above btn username mx-3" data-bs-toggle="modal" data-bs-target="#Followers{{$user->id}}">{{$user->followers->count()}} Followers</button>
-                         @if(!Request::is(Auth::user()->username))
-                         <button type="submit" class="btn {{App\Http\Controllers\HomeController::isFollowing($user) ? 'btn-success' : 'btn-info'}} rounded-pill text-white">{{App\Http\Controllers\HomeController::isFollowing($user) ? 'Following' : 'Follow'}}</button>
-                         @endif
-                    </form>
-               </div>
-               @foreach($user->entities as $tweet)
-               @if($tweet->post)
-               <div class="border-bottom border-light m-0 p-2 row position-relative tweet">
-                    <div class="col-2 p-0 mt-3 d-flex flex-column">
-                         <a href="/{{$tweet->user->username}}" class="above"><img src="{{asset($tweet->user->profileImage->path)}}" alt="" class="img profile-image rounded-circle mx-auto d-block"></a>
-                    </div>
-                    <div class="col-10 p-0 mt-3">
-                         <div class="d-flex align-items-center">
-                              <a href="/{{$tweet->user->username}}" class="above username"><h5 class="m-0 me-3 fw-bold">{{$tweet->user->name}}</h5></a>
-                              <h6 class="m-0 above"><a href="/{{$tweet->user->username}}" class="text-decoration-none atcolor">{{'@'.$tweet->user->username}}</a></h6>
-                         </div>
-                         <p class="lead mt-2">{{$tweet->content}}</p>
-                         @if($tweet->files)
-                              @foreach($tweet->files as $file)
-                                   @if($file->type == 'image')
-                                   <img src="{{asset($file->path)}}" width="100%" class="img rounded mb-2">
-                                   @elseif($file->type == 'video')
-                                   <div class="position-relative above">
-                                        <video src="{{asset($file->path)}}" controls width="100%"></video>
-                                   </div>
-                                   @endif
-                              @endforeach
-                         @endif
-                         <form action="{{ route('like', $tweet) }}" method="POST" class="d-flex justify-content-between">
-                              @csrf
-                              <button type="submit" class="above btn rounded-pill me-2 hover"><i class="fa-heart {{App\Http\Controllers\PostsController::isLiked($tweet) ? 'fa-solid' : 'fa-regular'}} text-danger me-2"></i>{{$tweet->amountOfLikes}}</button>
-                              <button type="button" class="above btn rounded-pill `comment` hover"><i class="fa-regular fa-comment comment-icon me-2"></i>{{$tweet->amountOfComments}}</button>
-                              <button type="button" class="above btn rounded-pill hover"><i class="fa-solid fa-retweet me-2"></i></button>
-                         </form>
-                    </div>
-                    <a href="{{ route('view.tweet', $tweet) }}">
-                         <span class="linkSpanner"></span>
-                    </a>
-               </div>
-               @endif
-               @endforeach
-          </div>
-          <div class="col-3">
-               <form action="" method="GET">
-                    <div class="input-group mb-3">
-                         <input  type="text" class="form-control border-info rounded-pill" placeholder="Search..." aria-describedby="button-addon">
-                         <button class="btn btn-outline-secondary d-none" type="button" id="button-addon">Button</button>
-                    </div>
-               </form>
+<div class="m-0 p-2 row border-bottom border-light">
+     <div class="col-4 p-0 justify-content-center">
+          <img src="{{asset($user->profileImage->path)}}" width="150px" height="150px" style="object-fit: cover;" class="img rounded-circle mx-auto d-block">
+          <div class="offset-2 mt-3">
+               <h5 class="m-0">{{$user->name}}</h5>
+               <h6>@<a>{{$user->username}}</a></h6>
           </div>
      </div>
+     <form action="{{ route('follow', $user) }}" method="POST" class="col-8 d-flex justify-content-end align-items-end">
+          @csrf
+          <button type="button" class="above btn username" data-bs-toggle="modal" data-bs-target="#Following{{$user->id}}">{{$user->following->count()}} Following</button>
+          <button type="button" class="above btn username mx-3" data-bs-toggle="modal" data-bs-target="#Followers{{$user->id}}">{{$user->followers->count()}} Followers</button>
+          @if(!Request::is(Auth::user()->username))
+          <button type="submit" class="btn {{App\Http\Controllers\HomeController::isFollowing($user) ? 'btn-success' : 'btn-info'}} rounded-pill text-white">{{App\Http\Controllers\HomeController::isFollowing($user) ? 'Following' : 'Follow'}}</button>
+          @endif
+     </form>
 </div>
-
+@foreach($user->entities as $tweet)
+@if($tweet->post)
+<div class="border-bottom border-light m-0 p-2 row position-relative tweet">
+     <div class="col-2 p-0 mt-3 d-flex flex-column">
+          <a href="/{{$tweet->user->username}}" class="above"><img src="{{asset($tweet->user->profileImage->path)}}" alt="" class="img profile-image rounded-circle mx-auto d-block"></a>
+     </div>
+     <div class="col-10 p-0 mt-3">
+          <div class="d-flex align-items-center">
+               <a href="/{{$tweet->user->username}}" class="above username"><h5 class="m-0 me-3 fw-bold">{{$tweet->user->name}}</h5></a>
+               <h6 class="m-0 above"><a href="/{{$tweet->user->username}}" class="text-decoration-none atcolor">{{'@'.$tweet->user->username}}</a></h6>
+          </div>
+          <p class="lead mt-2">{{$tweet->content}}</p>
+          @if($tweet->files)
+               @foreach($tweet->files as $file)
+                    @if($file->type == 'image')
+                    <img src="{{asset($file->path)}}" width="100%" class="img rounded mb-2">
+                    @elseif($file->type == 'video')
+                    <div class="position-relative above">
+                         <video src="{{asset($file->path)}}" controls width="100%"></video>
+                    </div>
+                    @endif
+               @endforeach
+          @endif
+          <form action="{{ route('like', $tweet) }}" method="POST" class="d-flex justify-content-between">
+               @csrf
+               <button type="submit" class="above btn rounded-pill me-2 hover"><i class="fa-heart {{App\Http\Controllers\PostsController::isLiked($tweet) ? 'fa-solid' : 'fa-regular'}} text-danger me-2"></i>{{$tweet->amountOfLikes}}</button>
+               <button type="button" class="above btn rounded-pill `comment` hover"><i class="fa-regular fa-comment comment-icon me-2"></i>{{$tweet->amountOfComments}}</button>
+               <button type="button" class="above btn rounded-pill hover"><i class="fa-solid fa-retweet me-2"></i></button>
+          </form>
+     </div>
+     <a href="{{ route('view.tweet', $tweet) }}">
+          <span class="linkSpanner"></span>
+     </a>
+</div>
+@endif
+@endforeach
 
 <!-- MODALS -->
 
@@ -147,16 +126,15 @@
 
 <script>
      $(document).ready(function () {
-        $('.comment').hover(function () {
-            $(this).children().addClass('fa-solid');
-        }, function () {
-          $(this).children().removeClass('fa-solid');
-        });
-        $('.linkSpanner').hover(function(){
-          $(this).parent().parent().css("background-color", "#F5F8FA");
-        },
-          function(){
-          $(this).parent().parent().css("background-color", "white");
+          $('.comment').hover(function () {
+               $(this).children().addClass('fa-solid');
+          }, function () {
+               $(this).children().removeClass('fa-solid');
+          });
+          $('.linkSpanner').hover(function(){
+               $(this).parent().parent().css("background-color", "#F5F8FA");
+          }, function(){
+               $(this).parent().parent().css("background-color", "white");
           });
     });
 </script>

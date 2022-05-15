@@ -61,9 +61,32 @@
                 </div>
             </div>
         </nav>
-
         <main class="py-4">
-            @yield('content')
+            @guest
+                @yield('content') 
+            @else
+            <div class="container">
+                <div class="row">
+                    <div class="col-3">
+                        <h3 class="mb-4"><a href="/home" class="text-decoration-none text-dark p-2 rounded-pill link-hover {{request()->route()->getName() == 'home' ? 'fw-bold' : false}}"><i class="fa-solid fa-house me-2 {{request()->route()->getName() == 'home' ? 'twitter-color' : false}}"></i>Home</a></h3>
+                        <h3 class="mb-4"><a href="" class="text-decoration-none text-dark p-2 rounded-pill link-hover"><i class="fa-solid fa-envelope me-2"></i>Messages</a></h3>
+                        <h3 class="mb-4"><a href="{{ route('profile', Auth::user()->username) }}" class="text-decoration-none text-dark p-2 rounded-pill link-hover {{request()->route()->getName() == 'profile' ? 'fw-bold' : false}}"><i class="fa-solid fa-user me-2 {{request()->route()->getName() == 'profile' ? 'twitter-color' : false}}"></i>Profile</a></h3>
+                        <h3 class="mb-4"><a class="text-decoration-none text-dark p-2 rounded-pill link-hover" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i class="fa-solid fa-arrow-right-from-bracket me-2"></i>{{ __('Logout') }}</a></h3>
+                    </div>
+                    <div class="col-5 p-0 start-section border border-light">
+                        @yield('content') 
+                    </div>
+                    <div class="col-3">
+                        <form action="" method="GET">
+                            <div class="input-group mb-3">
+                                <input  type="text" class="form-control border-info rounded-pill" placeholder="Search..." aria-describedby="button-addon">
+                                <button class="btn btn-outline-secondary d-none" type="button" id="button-addon">Button</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            @endguest
         </main>
     </div>
 </body>

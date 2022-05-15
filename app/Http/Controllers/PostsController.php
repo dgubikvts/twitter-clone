@@ -29,6 +29,8 @@ class PostsController extends Controller
         $tweet->entity_id = $entity->id;
         $entity->content = $request->input('content');
         $entity->user_id = Auth::id();
+        $entity->amountOfLikes = 0;
+        $entity->amountOfComments = 0;
         $tweet->save();
         $entity->save();
         if($request->has('files')){
@@ -44,7 +46,9 @@ class PostsController extends Controller
                 $new_file->create($entity->id, $file_name, $file_size, $path, $file_type);
             }
         }
-        return response()->json();
+        $image_paths = EntityFile::where('entity_id', $entity->id)->get();
+        error_log($entity->user->profileImage);
+        return response()->json(['tweet' => $entity, 'files' => $image_paths]);
     }
 
     public function viewTweet(Entity $entity){
