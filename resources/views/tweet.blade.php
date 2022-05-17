@@ -35,9 +35,9 @@
                     @endforeach
                     </div>
                @endif             
-               <form action="{{ route('like', $aboveTweet) }}" method="POST" class="d-flex justify-content-between">
+               <form action="{{ route('like') }}" method="POST" class="d-flex justify-content-between">
                     @csrf
-                    <button type="submit" class="above btn rounded-pill me-2 hover"><i class="fa-heart {{App\Http\Controllers\PostsController::isLiked($aboveTweet) ? 'fa-solid' : 'fa-regular'}} text-danger me-2"></i>{{$aboveTweet->amountOfLikes}}</button>
+                    <button type="submit" data-id="{{$aboveTweet->id}}" class="above btn rounded-pill me-2 hover submitLike"><i class="fa-heart {{App\Http\Controllers\PostsController::isLiked($aboveTweet) ? 'fa-solid' : 'fa-regular'}} text-danger me-2"></i>{{$aboveTweet->amountOfLikes}}</button>
                     <button type="button" class="above btn rounded-pill comment hover"><i class="fa-regular fa-comment comment-icon me-2"></i>{{$aboveTweet->amountOfComments}}</button>
                     <button type="button" class="above btn rounded-pill hover"><i class="fa-solid fa-retweet me-2"></i></button>
                </form>
@@ -77,13 +77,13 @@
           @endif
           <p class="py-3 m-0 border-bottom">Tweeted on: {{$entity->created_at}}</p>
           <div class="d-flex justify-content-between align-items-center">
-               <button type="button" class="btn px-0" data-bs-toggle="modal" data-bs-target="#Likes{{$entity->id}}">{{$entity->amountOfLikes}} likes</button>
+               <button type="button" class="btn px-0 amountOfLikes" data-bs-toggle="modal" data-bs-target="#MojModal">{{$entity->amountOfLikes}} likes</button>
                <p class="m-0 px-0">{{$entity->amountOfComments}} comments</p>
                <p class="m-0 px-0">x retweets</p>
           </div>
-          <form action="{{ route('like', $entity) }}" method="POST" class="d-flex justify-content-between border-top border-bottom">
+          <form action="{{ route('like') }}" method="POST" class="d-flex justify-content-between border-top border-bottom">
                @csrf
-               <button type="submit" class="btn rounded-pill hover"><i class="fa-heart {{App\Http\Controllers\PostsController::isLiked($entity) ? 'fa-solid' : 'fa-regular'}} text-danger"></i></button>
+               <button type="submit" data-id="{{$entity->id}}" data-type="tweet" class="btn rounded-pill hover submitLike"><i class="fa-heart {{App\Http\Controllers\PostsController::isLiked($entity) ? 'fa-solid' : 'fa-regular'}} text-danger"></i></button>
                <button type="button" class="btn rounded-pill comment hover"><i class="fa-regular fa-comment me-2"></i>{{$entity->amountOfComments}}</button>
                <button type="button" class="btn rounded-pill hover"><i class="fa-solid fa-retweet me-2"></i></button>
           </form>
@@ -133,9 +133,9 @@
                     @endforeach
                     </div>
                @endif
-               <form action="{{ route('like', $comment->entity) }}" method="POST" class="d-flex justify-content-between">
+               <form action="{{ route('like') }}" method="POST" class="d-flex justify-content-between">
                     @csrf
-                    <button type="submit" class="above btn rounded-pill me-2 hover"><i class="fa-heart {{App\Http\Controllers\PostsController::isLiked($comment->entity) ? 'fa-solid' : 'fa-regular'}} text-danger me-2"></i>{{$comment->entity->amountOfLikes}}</button>
+                    <button type="submit" data-id="{{$comment->entity->id}}" class="above btn rounded-pill me-2 hover submitLike"><i class="fa-heart {{App\Http\Controllers\PostsController::isLiked($comment->entity) ? 'fa-solid' : 'fa-regular'}} text-danger me-2"></i>{{$comment->entity->amountOfLikes}}</button>
                     <button type="button" class="above btn rounded-pill comment hover"><i class="fa-regular fa-comment comment-icon me-2"></i>{{$comment->entity->amountOfComments}}</button>
                     <button type="button" class="above btn rounded-pill hover"><i class="fa-solid fa-retweet me-2"></i></button>
                </form>
@@ -244,11 +244,76 @@
           }, function () {
                $(this).children().removeClass('fa-solid');
           });
-          $('.linkSpanner').hover(function(){
+          $(document).on("mouseenter", ".linkSpanner", function() {
                $(this).parent().parent().css("background-color", "#F5F8FA");
-          },function(){
+          });
+
+          $(document).on("mouseleave", ".linkSpanner", function() {
                $(this).parent().parent().css("background-color", "white");
           });
+
+          function updateModal(allLikes, user_id, following){
+               var baseUrl = "{{url('/')}}/";
+               $('.modal').remove();
+               modal = document.createElement('div');
+               $(modal).attr('class', 'modal fade');
+               $(modal).attr('id', 'MojModal');
+               $(modal).attr('tabindex', '-1');
+               $(modal).attr('aria-hidden', 'true');
+               $(modal).append(`
+               <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                         <div class="modal-header">
+                              <h5 class="modal-title">Likes</h5>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                         </div>
+                         <div class="modal-body">`);
+                              if(allLikes.length > 0){
+                                   for(var i = 0; i < allLikes.length; i++){
+                                        $(modal).find('.modal-body').append(`
+                                        <div class="d-flex mb-3 align-items-center position-relative row${i}">
+                                        <img src="${baseUrl}${allLikes[i].user.profile_image.path}" alt="" class="img profile-image rounded-circle me-3">
+                                        <div>
+                                             <p class="m-0">${allLikes[i].user.name}</p>
+                                             <p class="m-0">@<a href="/${allLikes[i].user.username}" class="text-decoration-none text-dark">${allLikes[i].user.username}</a></p>
+                                        </div>`);
+                                        if(allLikes[i].user.id != user_id){
+                                             $(modal).find(`.row${i}`).append(`
+                                             <form action="" method="POST" class="ms-auto above follow-form${i}">
+                                                  @csrf`);
+                                             if(following.length == 0)
+                                                  $(modal).find(`.follow-form${i}`).append(`<button type="submit" class="btn btn-info rounded-pill text-white">Follow</button>`);
+                                             jQuery.each(following, function(key, value){
+                                                  if(user_id == value.user_id && allLikes[i].user.id == value.following){
+                                                       $(modal).find(`.follow-form${i}`).append(`
+                                                       <button type="submit" class="btn btn-success rounded-pill text-white">Following</button>`);
+                                                  }
+                                                  else if(key == following.length - 1){
+                                                       $(modal).find(`.follow-form${i}`).append(`
+                                                       <button type="submit" class="btn btn-info rounded-pill text-white">Follow</button>`);
+                                                  }
+                                             });
+                                        }
+                                        $(modal).find(`.row${i}`).append(`
+                                        <a href="/${allLikes[i].user.username}">
+                                             <span class="linkSpanner"></span>
+                                        </a>
+                                        </div>`);
+                                   }
+                              }
+                              else
+                                   $(modal).find('.modal-body').append(`<p class="lead m-0">This post has 0 likes</p>`);
+                              $(modal).find('.modal-content').append(`
+                              <div class="modal-footer">
+                                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                              </div>`);
+               $('body').append(modal);
+          }
+
+          var allLikes = {!! str_replace("'", "\'", json_encode($entity->likes)) !!};
+          var user_id = "{{Auth::id()}}";
+          var following = {!! str_replace("'", "\'", json_encode(Auth::user()->following)) !!};
+          updateModal(allLikes, user_id, following);
 
           $("#upload-files").submit(function(e){
                e.preventDefault();
@@ -290,6 +355,48 @@
                     }
                });
           });
+
+          $(".submitLike").click(function (e) {
+               e.preventDefault();
+               var entity_id = $(this).attr('data-id');
+               var submitBtn = $(this);
+               $.ajaxSetup({
+                    headers: {
+                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    }
+                });
+               $.ajax({
+                    type: 'POST',
+                    url: "{{ route('like') }}",
+                    data: {
+                         entity_id: entity_id 
+                    },
+                    success: function (response) {
+                         if(submitBtn.data('type') == 'tweet'){
+                              if(response.liked)
+                                   submitBtn.html('<i class="fa-heart fa-solid text-danger"></i>');
+                              else
+                                   submitBtn.html('<i class="fa-heart fa-regular text-danger"></i>');
+                              $('.amountOfLikes').html(`${response.likes} likes`);
+                         }
+                         else{
+                              if(response.liked)
+                                   submitBtn.html('<i class="fa-heart fa-solid text-danger me-2"></i>' + response.likes);
+                              else
+                                   submitBtn.html('<i class="fa-heart fa-regular text-danger me-2"></i>' + response.likes);
+                         }
+                         updateModal(response.allLikes, response.user_id, response.following);
+
+
+                    
+
+
+                    }
+               });
+          });
+
+
+          
     });
 </script>
 

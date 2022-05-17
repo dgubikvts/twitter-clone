@@ -9,6 +9,7 @@ use App\Models\EntityFile;
 use App\Models\Posts;
 use App\Models\Like;
 use App\Models\Comment;
+use App\Models\Follow;
 use App\Models\User;
 
 class PostsController extends Controller
@@ -62,8 +63,9 @@ class PostsController extends Controller
         return view('tweet')->with('entity', $entity)->with('aboveTweets', $sorted);
     }
 
-    public function like(Entity $entity){
-        $like = Like::where([['user_id', Auth::id()], ['entity_id', $entity->id]])->first();
+    public function like(Request $request){
+        $like = Like::where([['user_id', Auth::id()], ['entity_id', $request->entity_id]])->first();
+        $entity = Entity::where('id', $request->entity_id)->firstOrFail();
         if($like){
             $like->removeLike();
             $entity->amountOfLikes--;
@@ -74,7 +76,11 @@ class PostsController extends Controller
             $entity->amountOfLikes++;
         }
         $entity->save();
-        return redirect()->back();
+        error_log($entity->likes);
+        $allLikes = Like::where('entity_id', $entity->id)->with('user.profileImage')->get();
+        $liked = $this->isLiked($entity);
+        $FollowingList = Follow::where('user_id', Auth::id())->with('followee')->get();
+        return response()->json(['likes' => $entity->amountOfLikes, 'liked' => $liked, 'allLikes' => $allLikes, 'user_id' => Auth::id(), 'following' => $FollowingList]);
     }
 
     public function comment(Request $request){

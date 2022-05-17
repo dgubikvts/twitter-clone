@@ -7,7 +7,7 @@
 {{ $error }}
 </div>
 @endforeach
-<form action="{{ route('tweet') }}" method="POST" class="d-flex p-2 insert-after" enctype="multipart/form-data" id="upload-files">
+<form method="POST" class="d-flex p-2 mt-3" enctype="multipart/form-data" id="upload-files">
      @csrf
      <div class="col-2">
           <a href="/{{Auth::user()->username}}"><img src="{{asset(Auth::user()->profileImage->path)}}" alt="" class="img profile-image rounded-circle mx-auto d-block"></a>
@@ -52,9 +52,9 @@
                     @endforeach
                </div>
                @endif
-               <form action="{{ route('like', $entity) }}" method="POST" class="d-flex justify-content-between">
+               <form action="{{ route('like') }}" method="POST" class="d-flex justify-content-between likeForm">
                     @csrf
-                    <button type="submit" class="above btn rounded-pill me-2 hover"><i class="fa-heart {{App\Http\Controllers\PostsController::isLiked($entity) ? 'fa-solid' : 'fa-regular'}} text-danger me-2"></i>{{$entity->amountOfLikes}}</button>
+                    <button type="submit" data-id="{{$entity->id}}" class="above btn rounded-pill me-2 hover submitLike"><i class="fa-heart {{App\Http\Controllers\PostsController::isLiked($entity) ? 'fa-solid' : 'fa-regular'}} text-danger me-2"></i>{{$entity->amountOfLikes}}</button>
                     <button type="button" class="above btn rounded-pill comment hover"><i class="fa-regular fa-comment me-2"></i>{{$entity->amountOfComments}}</button>
                     <button type="button" class="above btn rounded-pill hover"><i class="fa-solid fa-retweet me-2"></i></button>
                </form>
@@ -73,6 +73,7 @@
      var fileList = [];
      var fileInput = document.getElementById('file');
      var dataTransfer = new DataTransfer();
+
      function loadFile(fileInput){
           var imageWrap = document.getElementsByClassName('images-wrap')[0];
           var images = ['image/jpg', 'image/png', 'image/jpeg', 'image/gif', 'image/bmp'];
@@ -81,14 +82,14 @@
                fileList.push(fileInput.files[i]);
                if(images.includes(fileInput.files[i].type)){
                     imageWrap.innerHTML += 
-                    `<div class="position-relative p-2 div${fileList.length - 1} w-50">
+                    `<div class="position-relative p-2 div${fileList.length - 1} w-50 showcase">
                          <img src='${URL.createObjectURL(fileInput.files[i])}' class='img-grid'"/>
                          <button type="button" onclick="deleteFile(${fileList.length - 1})" class="btn p-0 delete-btn"><i class="fa-regular fa-circle-xmark display-4 x-dugme"></i></button>
                     </div>`;
                }
                else{
                     imageWrap.innerHTML += 
-                    `<div class="position-relative p-2 div${fileList.length - 1} w-50">
+                    `<div class="position-relative p-2 div${fileList.length - 1} w-50 showcase">
                          <video class='img-grid' controls src='${URL.createObjectURL(fileInput.files[i])}'></video>
                          <button type="button" onclick="deleteFile(${fileList.length - 1})" class="btn p-0 delete-btn"><i class="fa-regular fa-circle-xmark display-4 x-dugme"></i></button>
                     </div>`;
@@ -97,7 +98,6 @@
           fileInput.value = '';
           updateDataTransfer();
      }
-
 
      function updateDataTransfer(){
           dataTransfer.items.clear();
@@ -121,70 +121,7 @@
           referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
      }
 
-     function addTweet(tweet, user, profileImage, files){
-          var div = document.createElement('div');
-          var startSection = document.getElementsByClassName('start-section')[0];
-          var firstChild = document.getElementsByClassName('insert-after')[0];
-          div.classList.add('border-top', 'border-light', 'm-0', 'p-2', 'row', 'position-relative');
-          div.innerHTML += 
-          `<div class="col-2 p-0 mt-3 d-flex flex-column">
-               <a href="/${user.username}" class="above"><img src="${profileImage}" alt="" class="img profile-image rounded-circle mx-auto d-block"></a>
-          </div>
-          <div class="col-10 p-0 mt-3 append-form">
-               <div class="d-flex align-items-center">
-                    <a href="/${user.username}" class="above username"><h5 class="m-0 me-3 fw-bold">${user.name}</h5></a>
-                    <h6 class="m-0 above"><a href="/${user.username}" class="text-decoration-none atcolor">@${user.username}</a></h6>
-               </div>
-               <p class="lead mt-2">${tweet.content}</p>`;
-               if(files.length > 0){
-                    div.innerHTML += `<div class="d-flex flex-wrap">`;
-                         for(var i = 0; i < files.length; i++){
-                              if(files.length % 2 !== 0 && i == files.length - 1)
-                                   div.innerHTML += "<div class='w-100 pe-1'>";
-                              else
-                                   div.innerHTML += "<div class='w-50 pe-1'>";
-                              
-                              if(files[i].type == 'image'){
-                                   if(files.length == 1)
-                                        div.innerHTML += `<img src="${files[i].path}" class="img rounded mb-2 w-100">`;
-                                   else
-                                        div.innerHTML += `<img src="${files[i].path}" class="img rounded mb-2 img-grid">`;
-                              }
-                              else if(files[i].type == 'video'){
-                                   div.innerHTML += "<div class='position-relative above'>";
-                                   if(files.length == 1)
-                                        div.innerHTML += `<video src="${files[i].path}" class="w-100" controls></video> </div>`;
-                                   else
-                                        div.innerHTML += `<video src="${files[i].path}" class="img-grid" controls></video> </div>`;
-                              }
-                              div.innerHTML += "</div>";
-                         }
-                    div.innerHTML += "</div>";
-               }
-               var form = document.createElement("form");
-               form.classList.add("d-flex", "justify-content-between");
-               form.method = "POST";
-               var action = '{{ route("like", ":id") }}';
-               action = action.replace(':id', tweet.id);
-               var url = '{{ route("view.tweet", ":id") }}';
-               url = url.replace(':id', tweet.id);
-               form.action = action;
-               form.innerHTML += 
-                              `@csrf
-                              <button type="submit" class="above btn rounded-pill me-2 hover"><i class="fa-heart fa-regular text-danger me-2"></i>${tweet.amountOfLikes}</button>
-                              <button type="button" class="above btn rounded-pill comment hover"><i class="fa-regular fa-comment me-2"></i>${tweet.amountOfComments}</button>
-                              <button type="button" class="above btn rounded-pill hover"><i class="fa-solid fa-retweet me-2"></i></button>
-                         </form>
-                    </div>`;
-     insertAfter(firstChild, div);
-     var appendForm = document.getElementsByClassName('append-form')[0];
-     appendForm.appendChild(form);
-     var a = document.createElement('a');
-     a.href = url;
-     a.innerHTML = `<span class="linkSpanner"></span></div>`;
-     div.appendChild(a);
-     }
-
+     
      $(document).ready(function () {
           $('.comment').hover(function () {
                $(this).children().addClass('fa-solid');
@@ -199,6 +136,64 @@
                $(this).parent().parent().css("background-color", "white");
           });
           
+          function addTweet(tweet, user, profileImage, files){
+               var div = document.createElement('div');
+               $(div).attr('class', 'border-top border-light m-0 p-2 row position-relative');
+               $(div).append( 
+               `<div class="col-2 p-0 mt-3 d-flex flex-column">
+                    <a href="/${user.username}" class="above"><img src="${profileImage}" alt="" class="img profile-image rounded-circle mx-auto d-block"></a>
+               </div>
+               <div class="col-10 p-0 mt-3 append-form${tweet.id}">
+                    <div class="d-flex align-items-center">
+                         <a href="/${user.username}" class="above username"><h5 class="m-0 me-3 fw-bold">${user.name}</h5></a>
+                         <h6 class="m-0 above"><a href="/${user.username}" class="text-decoration-none atcolor">@${user.username}</a></h6>
+                    </div>
+                    <p class="lead mt-2">${tweet.content}</p>`);
+                    $(div).insertAfter("#upload-files");
+                    if(files.length > 0){
+                         $(`.append-form${tweet.id}`).append(`<div class="d-flex flex-wrap insert-file${tweet.id}">`);
+                         for(var i = 0; i < files.length; i++){
+                              if(files.length % 2 !== 0 && i == files.length - 1)
+                                   $(`.insert-file${tweet.id}`).append(`<div class='w-100 pe-1 file-place${tweet.id}-${i}'>`);
+                              else
+                                   $(`.insert-file${tweet.id}`).append(`<div class='w-50 pe-1 file-place${tweet.id}-${i}'>`);
+                              
+                              if(files[i].type == 'image'){
+                                   if(files.length == 1)
+                                        $(`.file-place${tweet.id}-${i}`).append(`<img src="${files[i].path}" class="img rounded mb-2 w-100">`);
+                                   else
+                                        $(`.file-place${tweet.id}-${i}`).append(`<img src="${files[i].path}" class="img rounded mb-2 img-grid">`);
+                              }
+                              else if(files[i].type == 'video'){
+                                   $(`.file-place${tweet.id}-${i}`).append(`<div class='position-relative above video-place${tweet.id}-${i}'>`);
+                                   if(files.length == 1)
+                                        $(`.video-place${tweet.id}-${i}`).append(`<video src="${files[i].path}" class="w-100" controls></video> </div>`);
+                                   else
+                                        $(`.video-place${tweet.id}-${i}`).append(`<video src="${files[i].path}" class="img-grid" controls></video> </div>`);
+                              }
+                         }
+                    }
+                    var form = document.createElement("form");
+                    $(form).attr('class', 'd-flex justify-content-between likeForm');
+                    $(form).attr('method', 'POST');
+                    var url = '{{ route("view.tweet", ":id") }}';
+                    url = url.replace(':id', tweet.id);
+                    $(form).append( 
+                              `
+                              <button type="submit" data-id="${tweet.id}" class="above btn rounded-pill me-2 hover submitLike"><i class="fa-heart fa-regular text-danger me-2"></i>${tweet.amountOfLikes}</button>
+                              <button type="button" class="above btn rounded-pill comment hover"><i class="fa-regular fa-comment me-2"></i>${tweet.amountOfComments}</button>
+                              <button type="button" class="above btn rounded-pill hover"><i class="fa-solid fa-retweet me-2"></i></button>
+                         </form>
+                    </div>`);
+          $(`.append-form${tweet.id}`).append(form);
+          var a = document.createElement('a');
+          a.href = url;
+          a.innerHTML = `<span class="linkSpanner"></span></div>`;
+          div.appendChild(a);
+          }
+
+
+
 
           $("#upload-files").submit(function(e){
                e.preventDefault();
@@ -217,7 +212,7 @@
                });
                $.ajax({
                     type: 'POST',
-                    url: "{{route('tweet')}}",
+                    url: "{{ route('tweet') }}",
                     data: formData,
                     cache:false,
                     contentType: false,
@@ -226,6 +221,9 @@
                     success: function (response) {
                          addTweet(response.tweet, response.tweet.user, response.tweet.user.profile_image.path, response.files);
                          submitBtn.prop('disabled', false);
+                         fileList = [];
+                         $('.textarea').val('');
+                         $('.showcase').remove();
                     },
                     statusCode: {
                          422: function(data) {
@@ -239,6 +237,29 @@
                               $( this ).remove();
                               });
                          }  
+                    }
+               });
+          });
+
+          $(document).on('click','.submitLike',function(e){
+               e.preventDefault();
+               var submitBtn = $(this);
+               var entity_id = $(submitBtn).attr('data-id');
+               console.log(entity_id);
+               $.ajaxSetup({
+                    headers: {
+                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    }
+               });
+               $.ajax({
+                    type: 'POST',
+                    url: "{{ route('like') }}",
+                    data: { entity_id: entity_id },
+                    success: function (response) {
+                         if(response.liked)
+                              submitBtn.html('<i class="fa-heart fa-solid text-danger me-2"></i>' + response.likes);
+                         else
+                              submitBtn.html('<i class="fa-heart fa-regular text-danger me-2"></i>' + response.likes);
                     }
                });
           });
