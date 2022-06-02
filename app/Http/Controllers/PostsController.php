@@ -60,6 +60,7 @@ class PostsController extends Controller
             $i = $tweetCollection[$tweetCollection->count() - 1];
         }
         $sorted = $tweetCollection->sortBy(['created_at', 'desc']);
+        $entity = Entity::where('id', $entity->id)->with('likes.user.profileImage')->first();
         return view('tweet')->with('entity', $entity)->with('aboveTweets', $sorted);
     }
 

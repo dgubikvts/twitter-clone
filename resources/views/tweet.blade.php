@@ -147,49 +147,6 @@
      @endforeach
 </div>
 
-<!-- MODALS -->
-
-<!-- likes -->
-<div class="modal fade" id="Likes{{$entity->id}}" tabindex="-1" aria-labelledby="LikesLabel" aria-hidden="true">
-     <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-               <div class="modal-header">
-                    <h5 class="modal-title" id="LikesLabel">Likes</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-               </div>
-               <div class="modal-body">
-                    @forelse($entity->likes as $like)
-                         <div class="d-flex mb-3 align-items-center position-relative">
-                              <img src="{{asset($like->user->profileImage->path)}}" alt="" class="img profile-image rounded-circle me-3">
-                              <div>
-                                   <p class="m-0">{{$like->user->name}}</p>
-                                   <p class="m-0">@<a href="/{{$like->user->username}}" class="text-decoration-none text-dark">{{$like->user->username}}</a></p>
-                              </div>
-                              @if($like->user->username !== Auth::user()->username)
-                              <form action="{{ route('follow', $like->user) }}" method="POST" class="ms-auto above">
-                                   @csrf
-                                   <button type="submit" class="btn {{App\Http\Controllers\HomeController::isFollowing($like->user) ? 'btn-success' : 'btn-info'}} rounded-pill text-white">{{App\Http\Controllers\HomeController::isFollowing($like->user) ? 'Following' : 'Follow'}}</button>
-                              </form>
-                              @endif
-                              <a href="/{{$like->user->username}}">
-                                   <span class="linkSpanner"></span>
-                              </a>
-                         </div>
-                    @empty
-                         <p class="lead m-0">This post has 0 likes</p>
-
-                    @endforelse
-               </div>
-               <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-               </div>
-          </div>
-     </div>
-</div>
-<!-- likes -->
-
-<!-- MODALS -->
-
 <script>
      var fileList = [];
      var fileInput = document.getElementById('file');
@@ -356,10 +313,10 @@
                });
           });
 
-          $(".submitLike").click(function (e) {
+          $(document).on('click','.submitLike',function(e){
                e.preventDefault();
-               var entity_id = $(this).attr('data-id');
                var submitBtn = $(this);
+               var entity_id = $(submitBtn).attr('data-id');
                $.ajaxSetup({
                     headers: {
                          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -368,9 +325,7 @@
                $.ajax({
                     type: 'POST',
                     url: "{{ route('like') }}",
-                    data: {
-                         entity_id: entity_id 
-                    },
+                    data: { entity_id: entity_id },
                     success: function (response) {
                          if(submitBtn.data('type') == 'tweet'){
                               if(response.liked)
@@ -386,11 +341,6 @@
                                    submitBtn.html('<i class="fa-heart fa-regular text-danger me-2"></i>' + response.likes);
                          }
                          updateModal(response.allLikes, response.user_id, response.following);
-
-
-                    
-
-
                     }
                });
           });

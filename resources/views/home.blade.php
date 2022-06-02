@@ -245,7 +245,6 @@
                e.preventDefault();
                var submitBtn = $(this);
                var entity_id = $(submitBtn).attr('data-id');
-               console.log(entity_id);
                $.ajaxSetup({
                     headers: {
                          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
